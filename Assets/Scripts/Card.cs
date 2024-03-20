@@ -8,12 +8,14 @@ public class Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public enum Type
     {
+        None,
         Fire,
         Ice,
         Earth,
         Elec,
         Light,
-        Dark
+        Dark,
+        Special,
     }
 
 
@@ -26,7 +28,6 @@ public class Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         public int cost;
         public string description;
     }
-
     [SerializeField] private CardInfo _card;
     [SerializeField] private TextMeshProUGUI _nameText;
     [SerializeField] private TextMeshProUGUI _damageText;
