@@ -83,7 +83,15 @@ public class Unit : MonoBehaviour
 
 
     // resolve effect
-    public void resolveEffect()
+    public void resolveEffect(EffectInfo effect, Unit caster)
+    {
+
+    }
+
+
+    // INDIVIDUAL EFFECTS:
+
+    private void Damage()
     {
 
     }
