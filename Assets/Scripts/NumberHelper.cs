@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-
+using System;
+using System.Linq;
 
 public static class NumberHelper
 {
@@ -11,21 +11,41 @@ public static class NumberHelper
     // weak to type
     const float weakMultipler = 2f;
 
-    public static readonly Type[][] oppositeTypes = new Type[][] {
-        new Type[] {Type.Fire, Type.Ice },
-        new Type[] {Type.Earth, Type.Elec },
-        new Type[] {Type.Light, Type.Dark },
+
+    public static readonly (Type, Type)[] oppositeTypes = new (Type, Type)[] {
+        (Type.Fire, Type.Ice),
+        (Type.Earth, Type.Elec),
+        (Type.Light, Type.Dark)
     };
-  
-    public static int calculateDamage(EffectInfo effect, Unit defender)
+
+    // calculate basic damage based on damage type, base damage, and defender type
+    public static int calculateBasicDamage(int baseDamage, Type damageType, Type defenderType)
     {
-        var baseDamage = effect.intensity;
-        var damageType = effect.type;
-        
-        
+        if (damageType == Type.None)
+        {
+            // todo: This might be the the wrong error type
+            throw new ArgumentException("Effect for damage cannot be none");
+        }
 
+        if (damageType == Type.Absolute)
+        {
+            return baseDamage;
+        }
 
-        return 0;
+        if (defenderType == damageType)
+        {
+            // we assume baseDamage is positive
+            return (int)(baseDamage * strongMultiplier);
+        }
+
+        if (oppositeTypes.Contains((defenderType, damageType)) ||
+            oppositeTypes.Contains((damageType, defenderType)))
+        {
+            return (int)(baseDamage * weakMultipler);
+        }
+
+        // no type weaknesses so return base damage
+        return baseDamage;
     }
     
 }
