@@ -16,29 +16,28 @@ public enum Type
     Special,
 }
 
+public enum TargetSpace
+{
+    Any,
+    AnyAlly,
+    AnyEnemy,
+    All,
+    AllAlly,
+    AllEnemy
+}
+
+[System.Serializable]
+public struct CardInfo
+{
+    public string name;
+    public Type type;
+    public int mana;
+    public TargetSpace targetSpace;
+    public EffectInfo[] effects; // maybe make into List<Effect>() instead
+}
 
 public class Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    public enum TargetSpace
-    {
-        Any,
-        AnyAlly,
-        AnyEnemy,
-        All,
-        AllAlly,
-        AllEnemy
-    }
-
-    [System.Serializable]
-    public class CardInfo
-    {
-        public string name;
-        public Type type;
-        public int mana;
-        public TargetSpace targetSpace;
-        public Effect[] effects; // maybe make into List<Effect>() instead
-    }
-
     [SerializeField] private CardInfo _card;
     [SerializeField] private TextMeshProUGUI _nameText;
     [SerializeField] private TextMeshProUGUI _damageText;
