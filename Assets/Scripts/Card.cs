@@ -4,30 +4,41 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.EventSystems;
 
+public enum Type
+{
+    None,
+    Fire,
+    Ice,
+    Earth,
+    Elec,
+    Light,
+    Dark,
+    Special,
+}
+
+
 public class Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    public enum Type
+    public enum TargetSpace
     {
-        None,
-        Fire,
-        Ice,
-        Earth,
-        Elec,
-        Light,
-        Dark,
-        Special,
+        Any,
+        AnyAlly,
+        AnyEnemy,
+        All,
+        AllAlly,
+        AllEnemy
     }
-
 
     [System.Serializable]
     public class CardInfo
     {
         public string name;
         public Type type;
-        public int damage;
-        public int cost;
-        public string description;
+        public int mana;
+        public TargetSpace targetSpace;
+        public Effect[] effects; // maybe make into List<Effect>() instead
     }
+
     [SerializeField] private CardInfo _card;
     [SerializeField] private TextMeshProUGUI _nameText;
     [SerializeField] private TextMeshProUGUI _damageText;
@@ -43,9 +54,7 @@ public class Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
         _nameText.text = _card.name;
         transform.name = _card.name + " - Card";
-        _damageText.text = $"Damage: {_card.damage}";
-        _costText.text = $"Cost: {_card.cost}";
-        _descText.text = _card.description;
+        _costText.text = $"Mana: {_card.mana}";
     }
 
     public void OnPointerEnter(PointerEventData eventData)
