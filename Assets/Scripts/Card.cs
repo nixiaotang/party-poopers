@@ -13,7 +13,7 @@ public enum Type
     Elec,
     Light,
     Dark,
-    Special,
+    Absolute,
 }
 
 public enum TargetSpace

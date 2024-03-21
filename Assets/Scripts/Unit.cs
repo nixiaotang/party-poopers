@@ -11,6 +11,8 @@ public class Unit : MonoBehaviour
     [SerializeField]
     private int baseMana = 10;
 
+    [SerializeField]
+    private Type type = Type.None;
     // NOTES:
     //  deck is also just used as draw
     //  by convention, end of deck is TOP
@@ -76,5 +78,15 @@ public class Unit : MonoBehaviour
         hand.RemoveAt(n);
         return playedCard;
     }
+
+
+
+
+    // resolve effect
+    public void resolveEffect()
+    {
+
+    }
+
 
 }
