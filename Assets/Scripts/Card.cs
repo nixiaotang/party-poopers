@@ -41,9 +41,9 @@ public class Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public CardInfo _card;
     [SerializeField] private TextMeshProUGUI _nameText;
-    [SerializeField] private TextMeshProUGUI _damageText;
-    [SerializeField] private TextMeshProUGUI _costText;
-    [SerializeField] private TextMeshProUGUI _descText;
+    [SerializeField] private TextMeshProUGUI _cardDescText;
+    [SerializeField] private Transform _effectParent;
+    [SerializeField] private GameObject _effectPrefab;
 
     private CardManager _cardManager;
 
@@ -54,7 +54,13 @@ public class Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
         _nameText.text = _card.name;
         transform.name = _card.name + " - Card";
-        _costText.text = $"Mana: {_card.mana}";
+        _cardDescText.text = $"Type: {_card.type}\nMana: {_card.mana}\nTS: {_card.targetSpace.ToString()}";
+
+        foreach(EffectInfo effectInfo in _card.effects)
+        {
+            GameObject effectObj = Instantiate(_effectPrefab, _effectParent);
+            effectObj.GetComponent<Effect>().Init(effectInfo);
+        }
     }
 
     public void OnPointerEnter(PointerEventData eventData)

@@ -1,5 +1,6 @@
 
 using UnityEngine;
+using TMPro;
 
 public enum EffectType
 {
@@ -28,5 +29,25 @@ public struct EffectInfo
 
 public class Effect : MonoBehaviour
 {
-    // handels UI stuff
+    private EffectInfo _effectInfo;
+
+    [SerializeField] private TextMeshProUGUI _effectText;
+    [SerializeField] private TextMeshProUGUI _intensityText;
+    [SerializeField] private TextMeshProUGUI _typeText;
+    [SerializeField] private TextMeshProUGUI _targetTypeText;
+    [SerializeField] private TextMeshProUGUI _innerMultText;
+    [SerializeField] private TextMeshProUGUI _outerMultText;
+
+
+    public void Init(EffectInfo effectInfo)
+    {
+        _effectInfo = effectInfo;
+
+        _effectText.text = _effectInfo.effect.ToString();
+        _intensityText.text = _effectInfo.intensity.ToString();
+        _typeText.text = _effectInfo.type.ToString();
+        _targetTypeText.text = _effectInfo.targetType == EffectTarget.All ? "ALL" : "RAND";
+        _innerMultText.text = $"x{_effectInfo.innerMult}";
+        _outerMultText.text = $"x{_effectInfo.outerMult}";
+    }
 }
