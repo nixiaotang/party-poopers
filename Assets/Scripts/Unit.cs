@@ -6,23 +6,23 @@ using System.Linq;
 public class Unit : MonoBehaviour
 {
     [SerializeField]
-    private int health = 10;
+    protected int health = 10;
 
     [SerializeField]
-    private int baseMana = 10;
+    protected int baseMana = 10;
 
     [SerializeField]
-    private Type type = Type.None;
+    protected Type type = Type.None;
     // NOTES:
     //  deck is also just used as draw
     //  by convention, end of deck is TOP
     //  front of deck is BOTTOM
           
     [SerializeField]
-    private List<Card> deck;
+    protected List<Card> deck;
 
-    private List<Card> hand;
-    private List<Card> discard;
+    protected List<Card> hand;
+    protected List<Card> discard;
 
     // Start is called before the first frame update
     void Start()
@@ -64,6 +64,11 @@ public class Unit : MonoBehaviour
     public List<Card> getHand()
     {
         return hand;
+    }
+    // get unit type
+    public Type getType()
+    {
+        return type;
     }
 
     // moves a card in a spot to discard, and then return it
