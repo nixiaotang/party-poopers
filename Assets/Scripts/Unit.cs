@@ -61,19 +61,19 @@ public class Unit : MonoBehaviour
     }
 
     // get hand
-    public List<Card> getHand()
+    public List<Card> GetHand()
     {
         return hand;
     }
     // get unit type
-    public Type getType()
+    public Type GetType()
     {
         return type;
     }
 
     // moves a card in a spot to discard, and then return it
     // we might not need to return the card
-    public Card moveToDiscard(int n)
+    public Card MoveToDiscard(int n)
     {
         if (n >= hand.Count)
         {
@@ -84,21 +84,29 @@ public class Unit : MonoBehaviour
         return playedCard;
     }
 
-
-
+    // deals damage straight to player
+    private void TakeDamage(int rawDamage)
+    {
+        health = System.Math.Max(rawDamage, 0);
+    }
 
     // resolve effect
-    public void resolveEffect(EffectInfo effect, Unit caster)
+    // we pass the caster of the spell incase they have some extra information
+    // attached to them
+    public void ResolveEffect(EffectInfo effect, Unit caster)
     {
-
+        if (effect.effect == EffectType.Damage)
+        {
+            Damage(effect, caster);
+        }
     }
 
 
     // INDIVIDUAL EFFECTS:
-
-    private void Damage()
+    private void Damage(EffectInfo effect, Unit caster)
     {
-
+        var damageTaken = NumberHelper.CalculateBasicDamage(effect.intensity, effect.type, GetType());
+        TakeDamage(damageTaken);
     }
 
 

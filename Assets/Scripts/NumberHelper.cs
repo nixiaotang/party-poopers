@@ -19,7 +19,7 @@ public static class NumberHelper
     };
 
     // calculate basic damage based on damage type, base damage, and defender type
-    public static int calculateBasicDamage(int baseDamage, Type damageType, Type defenderType)
+    public static int CalculateBasicDamage(int baseDamage, Type damageType, Type defenderType)
     {
         if (damageType == Type.None)
         {
@@ -43,7 +43,6 @@ public static class NumberHelper
         {
             return (int)(baseDamage * weakMultipler);
         }
-
         // no type weaknesses so return base damage
         return baseDamage;
     }
