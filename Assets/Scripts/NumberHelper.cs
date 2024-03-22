@@ -11,6 +11,8 @@ public static class NumberHelper
     // weak to type
     const float weakMultipler = 2f;
 
+    const float casterBonusMult = 1.5f;
+
 
     public static readonly (Type, Type)[] oppositeTypes = new (Type, Type)[] {
         (Type.Fire, Type.Ice),
@@ -19,8 +21,14 @@ public static class NumberHelper
     };
 
     // calculate basic damage based on damage type, base damage, and defender type
-    public static int CalculateBasicDamage(int baseDamage, Type damageType, Type defenderType)
+    public static int CalculateBasicDamage(int baseDamage, Type damageType, Type defenderType, Type casterType)
     {
+        float casterBonus = 1;
+        if (damageType == casterType)
+        {
+            casterBonus = 1.5f;
+        }
+
         if (damageType == Type.None)
         {
             // todo: This might be the the wrong error type
@@ -35,13 +43,13 @@ public static class NumberHelper
         if (defenderType == damageType)
         {
             // we assume baseDamage is positive
-            return (int)(baseDamage * strongMultiplier);
+            return (int)(baseDamage * strongMultiplier * casterBonus);
         }
 
         if (oppositeTypes.Contains((defenderType, damageType)) ||
             oppositeTypes.Contains((damageType, defenderType)))
         {
-            return (int)(baseDamage * weakMultipler);
+            return (int)(baseDamage * weakMultipler * casterBonus);
         }
         // no type weaknesses so return base damage
         return baseDamage;

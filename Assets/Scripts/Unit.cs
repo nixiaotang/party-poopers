@@ -6,7 +6,8 @@ using System.Linq;
 public class Unit : MonoBehaviour
 {
     [SerializeField]
-    protected int health = 10;
+    protected int maxHealth = 10;
+    protected int health;
 
     [SerializeField]
     protected int baseMana = 10;
@@ -28,11 +29,12 @@ public class Unit : MonoBehaviour
     void Start()
     {
         Shuffle();
+        health = maxHealth;
     }
 
     
     // moves discard to deck, then shuffles
-    void Shuffle()
+    protected void Shuffle()
     {
         deck.AddRange(discard);
         discard.Clear();
@@ -66,7 +68,7 @@ public class Unit : MonoBehaviour
         return hand;
     }
     // get unit type
-    public Type GetType()
+    public Type GetUnitType()
     {
         return type;
     }
@@ -84,14 +86,29 @@ public class Unit : MonoBehaviour
         return playedCard;
     }
 
+
+    // raw effects
     // deals damage straight to player
-    private void TakeDamage(int rawDamage)
+    protected void RawTakeDamage(int rawDamage)
     {
-        health = System.Math.Max(rawDamage, 0);
+        health = System.Math.Max(health + rawDamage, 0);
+    }
+    // heals directly
+    protected void RawHealHealth(int rawHeal)
+    {
+        health = System.Math.Min(health + rawHeal, maxHealth);
     }
 
+
+
     // resolve effect
+
+    // we assume the gamemanager has passed a single instance of an effect to
+    // the Unit. This means we dont care about information such as inner mult
+    // outermult, as the gamemanager deals with those.
+
     // we pass the caster of the spell incase they have some extra information
+    // when calculating damage
     // attached to them
     public void ResolveEffect(EffectInfo effect, Unit caster)
     {
@@ -99,15 +116,25 @@ public class Unit : MonoBehaviour
         {
             Damage(effect, caster);
         }
+        else if (effect.effect == EffectType.Heal)
+        {
+            Heal(effect, caster);
+        }
     }
 
 
     // INDIVIDUAL EFFECTS:
     private void Damage(EffectInfo effect, Unit caster)
     {
-        var damageTaken = NumberHelper.CalculateBasicDamage(effect.intensity, effect.type, GetType());
-        TakeDamage(damageTaken);
+        var damageTaken = NumberHelper.CalculateBasicDamage(effect.intensity, effect.type, GetUnitType(), caster.GetUnitType());
+        // we can call animations or effects here?
+        RawTakeDamage(damageTaken);
     }
 
+    private void Heal(EffectInfo effect, Unit caster)
+    {
+        var amountHealed = effect.intensity;
 
+        RawHealHealth(amountHealed);
+    }
 }
