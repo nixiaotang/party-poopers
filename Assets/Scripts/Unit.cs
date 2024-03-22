@@ -112,13 +112,17 @@ public class Unit : MonoBehaviour
     // attached to them
     public void ResolveEffect(EffectInfo effect, Unit caster)
     {
-        if (effect.effect == EffectType.Damage)
+        switch (effect.effect)
         {
-            Damage(effect, caster);
-        }
-        else if (effect.effect == EffectType.Heal)
-        {
-            Heal(effect, caster);
+            case EffectType.Damage:
+                Damage(effect, caster);
+                break;
+            case EffectType.Heal:
+                Heal(effect, caster);
+                break;
+            case EffectType.Draw:
+                DrawCardEffect(effect, caster);
+                break;
         }
     }
 
@@ -136,5 +140,11 @@ public class Unit : MonoBehaviour
         var amountHealed = effect.intensity;
 
         RawHealHealth(amountHealed);
+    }
+
+    private void DrawCardEffect(EffectInfo effect, Unit caster)
+    {
+        var n = effect.intensity;
+        DrawCards(n);
     }
 }
