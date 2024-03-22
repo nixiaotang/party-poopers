@@ -11,6 +11,11 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private List<EnemyUnit> enemies;
 
+    // turn info
+    private bool playerTurn = true;
+    private int playerTurnNum = 0;
+    private int enemyTurnNum = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -23,28 +28,9 @@ public class GameManager : MonoBehaviour
         
     }
 
-    // checks if the intended target is valid
-    private bool CheckValidIntendedTarget(TargetSpace targetSpace, Unit intendedTarget)
+    // probably helpful for UI
+    public List<Unit> GetTargetsFromTargetSpace(TargetSpace targetSpace, Unit target)
     {
-        if (targetSpace == TargetSpace.Any || targetSpace == TargetSpace.All)
-        {
-            return true;
-        }
-
-        bool isPartyMember = intendedTarget is PartyMember;
-
-        if (isPartyMember)
-        {
-            return targetSpace == TargetSpace.AllAlly || targetSpace == TargetSpace.AnyAlly;
-        }
-
-        return targetSpace == TargetSpace.AllEnemy || targetSpace == TargetSpace.AnyEnemy;
-    }
-
-
-    private List<Unit> GetTargetsFromTargetSpace(TargetSpace targetSpace, Unit target)
-    {
-        // pre: assume target is valid
         List<Unit> targets = new() { };
 
         switch (targetSpace)
@@ -59,22 +45,36 @@ public class GameManager : MonoBehaviour
             case TargetSpace.AllEnemy:
                 targets.AddRange(enemies);
                 break;
-            default:
-                targets.Add(target); // valid target so any
+            case TargetSpace.AnyAlly:
+                if (target is PartyMember)
+                {
+                    targets.Add(target);
+                }
+                break;
+            case TargetSpace.AnyEnemy:
+                if (target is EnemyUnit)
+                {
+                    targets.Add(target);
+                }
+                break;
+            case TargetSpace.Any:
+                targets.Add(target);
                 break;
         }
         return targets;
     }
 
     // returns if card could be resolved or not
-    public bool ResolveCard(Card card, Unit caster, Unit intendedTarget)
+    private bool ResolveCard(Card card, Unit caster, Unit intendedTarget)
     {
         TargetSpace targetSpace = card._card.targetSpace; 
-        if (!CheckValidIntendedTarget(targetSpace, intendedTarget))
+
+        List<Unit> targets = GetTargetsFromTargetSpace(targetSpace, intendedTarget);
+
+        if (targets.Count == 0)
         {
             return false;
         }
-        List<Unit> targets = GetTargetsFromTargetSpace(targetSpace, intendedTarget);
         EffectInfo[] effectInfos = card._card.effects;
 
         foreach (EffectInfo effect in effectInfos)
@@ -94,13 +94,84 @@ public class GameManager : MonoBehaviour
     
         switch (effect.effect)
         {
-            // add any special cases here (things like random, self damage, etc)
+            // add any special cases here (things like random, self damage/draw, etc)
 
-            default:
+            // damage (basic), heal, draw.
+            default: 
                 for (int i = 0; i < effect.innerMult; i++) {
                     target.ResolveEffect(effect, caster);
                 }
                 break;
         }
     }
+
+    // turn management
+
+    private Unit GetCurrentUnit()
+    {
+        if (playerTurn)
+        {
+            return players[playerTurnNum];
+        }
+        return enemies[enemyTurnNum];
+    }
+
+    // increments turn counter information
+    private void IncrementTurn()
+    {
+        if (playerTurn)
+        {
+            playerTurnNum = (playerTurnNum + 1) % players.Count;
+            if (playerTurnNum == 0)
+            {
+                playerTurn = false;
+            }
+        } else
+        {
+            enemyTurnNum = (enemyTurnNum + 1) % enemies.Count;
+            if (enemyTurnNum == 0)
+            {
+                playerTurn = true;
+            }
+        }
+    }
+
+    // changes turn, checks for any dead players / enemies and updates
+    // turn num accordingly by skipping units that cannot play
+    public void EndTurn()
+    {
+        bool currentPlayerTurn = playerTurn;
+        int currentNum = currentPlayerTurn ? enemyTurnNum : playerTurnNum;
+
+        GetCurrentUnit().EndTurn();
+        IncrementTurn();
+
+        // this is horrible and might be wrong
+        while (currentPlayerTurn != playerTurn || currentNum != (playerTurn ? enemyTurnNum : playerTurnNum))
+        {
+            if (GetCurrentUnit().CanPlay())
+            {
+                break;
+            }
+            IncrementTurn();
+        }
+        GetCurrentUnit().StartTurn();
+    }
+
+
+    // playing cards
+    // attempts to play a card returns true if succesful
+    public bool PlayCard(int n, Unit intendedTarget)
+    {
+        Unit currentUnit = GetCurrentUnit();
+
+        if (!currentUnit.CanPlayCard(n))
+        {
+            return false;
+        }
+        Card card = currentUnit.GetHand()[n];
+        return ResolveCard(card, currentUnit, intendedTarget);
+    }
+
+
 }

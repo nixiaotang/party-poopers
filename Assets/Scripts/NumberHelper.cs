@@ -26,7 +26,7 @@ public static class NumberHelper
         float casterBonus = 1;
         if (damageType == casterType)
         {
-            casterBonus = 1.5f;
+            casterBonus = casterBonusMult;
         }
 
         if (damageType == Type.None)

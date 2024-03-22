@@ -10,7 +10,9 @@ public class Unit : MonoBehaviour
     protected int health;
 
     [SerializeField]
-    
+    protected int startingHandSize = 5;
+
+    [SerializeField]
     protected int baseMana = 10;
     protected int mana;
 
@@ -47,7 +49,13 @@ public class Unit : MonoBehaviour
         deck = deck.OrderBy(_ => rng.Next()).ToList();
     }
 
-    public void DrawCards(int n = 1)
+    // checks if this unit can play its turn at all (dead or other statuses)
+    public bool CanPlay()
+    {
+        return health > 0;
+    }
+
+    private void DrawCards(int n = 1)
     {
         for (int i = 0; i < n; i ++)
         {
@@ -77,13 +85,9 @@ public class Unit : MonoBehaviour
     }
 
     // moves a card in a spot to discard, and then return it
-    // we might not need to return the card
-    public Card MoveToDiscard(int n)
+    private Card MoveToDiscard(int n)
     {
-        if (n >= hand.Count)
-        {
-            throw new System.ArgumentException(string.Format("Invalid card number: {0} max is: {1}", n, hand.Count), "n");
-        }
+        // pre: assume n is valid
         var playedCard = hand[n];
         hand.RemoveAt(n);
         return playedCard;
@@ -97,7 +101,7 @@ public class Unit : MonoBehaviour
         }
         return hand[n].GetComponent<CardInfo>().mana <= mana;
     }
-
+    // moves a card to discard, subtracts mana cost, and returns the card.
     public Card PlayCard(int n)
     {
         // pre: checks for can play should have been made
@@ -110,14 +114,23 @@ public class Unit : MonoBehaviour
             //todo this is probably the wrong error look this up later
             throw new System.ArgumentException(string.Format("Cannot play card {0}", n), "n");
         }
+        
         mana -= hand[n]._card.mana;
         return MoveToDiscard(n);
     }
+    // starts turn by drawing required cards
+    public void StartTurn()
+    {
+        DrawCards(startingHandSize);
+    }
 
     // ends turn by discarding all cards from this players hand
-    public void endTurn()
+    public void EndTurn()
     {
-
+        while (hand.Count > 0)
+        {
+            MoveToDiscard(0);
+        }
     }
 
     // raw effects
