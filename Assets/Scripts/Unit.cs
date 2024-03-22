@@ -10,7 +10,9 @@ public class Unit : MonoBehaviour
     protected int health;
 
     [SerializeField]
+    
     protected int baseMana = 10;
+    protected int mana;
 
     [SerializeField]
     protected Type type = Type.None;
@@ -30,6 +32,7 @@ public class Unit : MonoBehaviour
     {
         Shuffle();
         health = maxHealth;
+        mana = baseMana;
     }
 
     
@@ -86,6 +89,36 @@ public class Unit : MonoBehaviour
         return playedCard;
     }
 
+    public bool CanPlayCard(int n)
+    {
+        if (n >= hand.Count)
+        {
+            throw new System.ArgumentException(string.Format("Invalid card number: {0} max is: {1}", n, hand.Count), "n");
+        }
+        return hand[n].GetComponent<CardInfo>().mana <= mana;
+    }
+
+    public Card PlayCard(int n)
+    {
+        // pre: checks for can play should have been made
+        if (n >= hand.Count)
+        {
+            throw new System.ArgumentException(string.Format("Invalid card number: {0} max is: {1}", n, hand.Count), "n");
+        }
+        if (!CanPlayCard(n))
+        {
+            //todo this is probably the wrong error look this up later
+            throw new System.ArgumentException(string.Format("Cannot play card {0}", n), "n");
+        }
+        mana -= hand[n]._card.mana;
+        return MoveToDiscard(n);
+    }
+
+    // ends turn by discarding all cards from this players hand
+    public void endTurn()
+    {
+
+    }
 
     // raw effects
     // deals damage straight to player

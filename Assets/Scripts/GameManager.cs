@@ -69,21 +69,38 @@ public class GameManager : MonoBehaviour
     // returns if card could be resolved or not
     public bool ResolveCard(Card card, Unit caster, Unit intendedTarget)
     {
-        TargetSpace targetSpace = card.GetComponent<CardInfo>().targetSpace; 
+        TargetSpace targetSpace = card._card.targetSpace; 
         if (!CheckValidIntendedTarget(targetSpace, intendedTarget))
         {
             return false;
         }
         List<Unit> targets = GetTargetsFromTargetSpace(targetSpace, intendedTarget);
+        EffectInfo[] effectInfos = card._card.effects;
 
-
-
-
+        foreach (EffectInfo effect in effectInfos)
+        {
+            foreach (Unit target in targets)
+            {
+                for (int i = 0; i < effect.outerMult; i++)
+                {
+                    ResolveInner(effect, target, caster);
+                }
+            }
+        }
         return true;
     }
-
-    private void ResolveOuter(EffectInfo effect, Unit caster)
+    private void ResolveInner(EffectInfo effect, Unit target, Unit caster)
     {
+    
+        switch (effect.effect)
+        {
+            // add any special cases here (things like random, self damage, etc)
 
+            default:
+                for (int i = 0; i < effect.innerMult; i++) {
+                    target.ResolveEffect(effect, caster);
+                }
+                break;
+        }
     }
 }

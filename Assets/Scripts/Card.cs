@@ -38,7 +38,7 @@ public struct CardInfo
 
 public class Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [SerializeField] private CardInfo _card;
+    public CardInfo _card;
     [SerializeField] private TextMeshProUGUI _nameText;
     [SerializeField] private TextMeshProUGUI _damageText;
     [SerializeField] private TextMeshProUGUI _costText;
