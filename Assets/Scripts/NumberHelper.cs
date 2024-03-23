@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
+
 using System.Linq;
 
 public static class NumberHelper
@@ -12,6 +12,9 @@ public static class NumberHelper
     const float weakMultipler = 2f;
 
     const float casterBonusMult = 1.5f;
+
+    // RNG systems
+    public static System.Random comabtRNG = new System.Random();
 
 
     public static readonly (Type, Type)[] oppositeTypes = new (Type, Type)[] {
@@ -32,7 +35,7 @@ public static class NumberHelper
         if (damageType == Type.None)
         {
             // todo: This might be the the wrong error type
-            throw new ArgumentException("Effect for damage cannot be none");
+            throw new System.ArgumentException("Effect for damage cannot be none");
         }
 
         if (damageType == Type.Absolute)

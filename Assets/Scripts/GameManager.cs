@@ -105,7 +105,7 @@ public class GameManager : MonoBehaviour
             {
                 if (effect.targetType == EffectTarget.Random)
                 {
-
+                    ResolveInner(effect, targets[NumberHelper.comabtRNG.Next(targets.Count)], caster);
                 }
                 else if (effect.targetType == EffectTarget.All)
                 {

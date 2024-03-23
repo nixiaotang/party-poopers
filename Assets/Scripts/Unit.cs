@@ -45,8 +45,7 @@ public class Unit : MonoBehaviour
         discard.Clear();
 
         // todo: check this lol
-        var rng = new System.Random();
-        deck = deck.OrderBy(_ => rng.Next()).ToList();
+        deck = deck.OrderBy(_ => NumberHelper.comabtRNG.Next()).ToList();
     }
 
     // checks if this unit can play its turn at all (dead or other statuses)
