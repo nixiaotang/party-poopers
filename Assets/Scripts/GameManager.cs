@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
@@ -28,8 +29,9 @@ public class GameManager : MonoBehaviour
         
     }
 
-    // probably helpful for UI
-    public List<Unit> GetTargetsFromTargetSpace(TargetSpace targetSpace, Unit target)
+    // get targets give targetSpace and target, can be empty if target
+    // is invalid
+    private List<Unit> GetTargetsFromTarget(TargetSpace targetSpace, Unit target, Unit caster)
     {
         List<Unit> targets = new() { };
 
@@ -40,25 +42,44 @@ public class GameManager : MonoBehaviour
                 targets.AddRange(enemies);
                 break;
             case TargetSpace.AllAlly:
-                targets.AddRange(players);
+                if (caster is PartyMember)
+                {
+                    targets.AddRange(players);
+                } else
+                {
+                    targets.AddRange(enemies);
+                }
                 break;
             case TargetSpace.AllEnemy:
-                targets.AddRange(enemies);
+                if (caster is PartyMember)
+                {
+                    targets.AddRange(enemies);
+                }
+                else
+                {
+                    targets.AddRange(players);
+                }
                 break;
             case TargetSpace.AnyAlly:
-                if (target is PartyMember)
+                if (target.GetType() == caster.GetType())
                 {
                     targets.Add(target);
                 }
                 break;
             case TargetSpace.AnyEnemy:
-                if (target is EnemyUnit)
+                if (target.GetType() != caster.GetType())
                 {
                     targets.Add(target);
                 }
                 break;
             case TargetSpace.Any:
                 targets.Add(target);
+                break;
+            case TargetSpace.Self:
+                if (caster == target)
+                {
+                    targets.Add(target);
+                }
                 break;
         }
         return targets;
@@ -69,7 +90,7 @@ public class GameManager : MonoBehaviour
     {
         TargetSpace targetSpace = card._card.targetSpace; 
 
-        List<Unit> targets = GetTargetsFromTargetSpace(targetSpace, intendedTarget);
+        List<Unit> targets = GetTargetsFromTarget(targetSpace, intendedTarget, caster);
 
         if (targets.Count == 0)
         {
@@ -79,11 +100,23 @@ public class GameManager : MonoBehaviour
 
         foreach (EffectInfo effect in effectInfos)
         {
-            foreach (Unit target in targets)
+
+            for (int i = 0; i < effect.outerMult; i++)
             {
-                for (int i = 0; i < effect.outerMult; i++)
+                if (effect.targetType == EffectTarget.Random)
                 {
-                    ResolveInner(effect, target, caster);
+
+                }
+                else if (effect.targetType == EffectTarget.All)
+                {
+                    foreach (Unit target in targets)
+                    {
+                        ResolveInner(effect, target, caster);
+                    }
+                }
+                else if (effect.targetType == EffectTarget.Self)
+                {
+                    ResolveInner(effect, caster, caster);
                 }
             }
         }
@@ -97,7 +130,7 @@ public class GameManager : MonoBehaviour
             // add any special cases here (things like random, self damage/draw, etc)
 
             // damage (basic), heal, draw.
-            default: 
+            default:
                 for (int i = 0; i < effect.innerMult; i++) {
                     target.ResolveEffect(effect, caster);
                 }
@@ -149,7 +182,7 @@ public class GameManager : MonoBehaviour
         // this is horrible and might be wrong
         while (currentPlayerTurn != playerTurn || currentNum != (playerTurn ? enemyTurnNum : playerTurnNum))
         {
-            if (GetCurrentUnit().CanPlay())
+            if (GetCurrentUnit().CanAct())
             {
                 break;
             }
@@ -173,5 +206,51 @@ public class GameManager : MonoBehaviour
         return ResolveCard(card, currentUnit, intendedTarget);
     }
 
+    public bool IsPlayerTurn()
+    {
+        return playerTurn;
+    }
+
+
+    public List<Card> GetCurrentUnitCards()
+    {
+        return GetCurrentUnit().GetHand();
+    }
+    public int GetCurrentUnitDrawSize()
+    {
+        return GetCurrentUnit().GetDrawSize();
+    }
+    public int GetCurrentUnitDiscard()
+    {
+        return GetCurrentUnit().GetDiscardSize();
+    }
+
+
+    private List<int> GetPlayableCardPositions()
+    {
+        return Enumerable.Range(0, GetCurrentUnit().GetHand().Count)
+                         .Where(i => GetCurrentUnit().CanPlayCard(i))
+                         .ToList();
+    }
+    // generates a list of int unit pairs
+    // each pair is the position of a card, and a target it can hit
+    // this should be super helpful for UI as it allows you to find out which
+    // cards can target what
+    public List<(int, Unit)> GetAllCardTargetPairs()
+    {
+        Unit currentUnit = GetCurrentUnit();
+        List<(int, Unit)> pairs = new();
+        foreach (int i in GetPlayableCardPositions())
+        {
+            TargetSpace targetSpace = currentUnit.GetHand()[i]._card.targetSpace;
+            foreach (Unit target in players.Concat<Unit>(enemies))
+            {
+                if (GetTargetsFromTarget(targetSpace, target, currentUnit).Count > 0) {
+                    pairs.Add((i, target));
+                }
+            }
+        }
+        return pairs;
+    }
 
 }

@@ -50,7 +50,7 @@ public class Unit : MonoBehaviour
     }
 
     // checks if this unit can play its turn at all (dead or other statuses)
-    public bool CanPlay()
+    public bool CanAct()
     {
         return health > 0;
     }
@@ -78,6 +78,15 @@ public class Unit : MonoBehaviour
     {
         return hand;
     }
+    public int GetDiscardSize()
+    {
+        return discard.Count();
+    }
+    public int GetDrawSize()
+    {
+        return deck.Count();
+    }
+
     // get unit type
     public Type GetUnitType()
     {

@@ -45,7 +45,7 @@ public static class NumberHelper
             // we assume baseDamage is positive
             return (int)(baseDamage * strongMultiplier * casterBonus);
         }
-
+        // if weakness pair is in opposite types
         if (oppositeTypes.Contains((defenderType, damageType)) ||
             oppositeTypes.Contains((damageType, defenderType)))
         {

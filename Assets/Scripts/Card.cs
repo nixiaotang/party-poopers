@@ -23,7 +23,8 @@ public enum TargetSpace
     AnyEnemy,
     All,
     AllAlly,
-    AllEnemy
+    AllEnemy,
+    Self
 }
 
 [System.Serializable]

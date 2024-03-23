@@ -11,7 +11,8 @@ public enum EffectType
 public enum EffectTarget
 {
     Random,
-    All
+    All,
+    Self
 }
 
 [System.Serializable]
