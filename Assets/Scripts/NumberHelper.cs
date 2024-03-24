@@ -13,7 +13,9 @@ public static class NumberHelper
     const float casterBonusMult = 1.5f;
 
     // RNG systems
-    public static System.Random comabtRNG = new System.Random();
+    // should all be seeded by one central RNG at the start later
+    public static System.Random comabtRNG = new();
+    public static System.Random AIRNG = new();
 
     public static readonly (Type, Type)[] oppositeTypes = new (Type, Type)[] {
         (Type.Fire, Type.Ice),

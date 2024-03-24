@@ -26,6 +26,7 @@ public abstract class EnemyAI
     // children will pass in a game state to this function, give it as much info
     // as possible
     public abstract ActionInfo ChooseAction(List<PartyMember> partyMembers, List<EnemyUnit> enemyUnits, Unit caster, List<ActionInfo> allPossibleActions);
+    public abstract ActionInfo ChooseAction(List<ActionInfo> allPossibleActions);
 }
 
 
@@ -68,6 +69,13 @@ public class EnemyUnit : Unit
         return actions;
     }
 
+
+    // temporary
+    public ActionInfo GiveAction(List<(int, Unit)> allPossibleCardUnitPairs)
+    {
+        return enemyAI.ChooseAction(GetPossibleAIActions(allPossibleCardUnitPairs));
+    }
+
     public ActionInfo GiveAction(List<PartyMember> partyMembers, List<EnemyUnit> enemyUnits, Unit caster, List<(int, Unit)> allPossibleCardUnitPairs)
     {
         if (caster != this)
@@ -76,6 +84,5 @@ public class EnemyUnit : Unit
         }
         return enemyAI.ChooseAction(partyMembers, enemyUnits, caster, GetPossibleAIActions(allPossibleCardUnitPairs));
     }
-    
 }
 

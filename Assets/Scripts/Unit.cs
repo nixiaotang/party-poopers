@@ -196,13 +196,14 @@ public class Unit : MonoBehaviour
     private void Heal(EffectInfo effect, Unit caster)
     {
         var amountHealed = effect.intensity;
-
+        // anim
         RawHealHealth(amountHealed);
     }
 
     private void DrawCardEffect(EffectInfo effect, Unit caster)
     {
         var n = effect.intensity;
+        // anim
         DrawCards(n);
     }
 }

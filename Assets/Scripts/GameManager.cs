@@ -92,7 +92,8 @@ public class GameManager : MonoBehaviour
                 else if (effect.targetType == EffectTarget.Self)
                 {
                     ResolveInner(effect, caster, caster);
-                } else if (effect.targetType == EffectTarget.SelectedTarget)
+                }
+                else if (effect.targetType == EffectTarget.SelectedTarget)
                 {
                     ResolveInner(effect, intendedTarget, caster);
                 }
@@ -158,6 +159,7 @@ public class GameManager : MonoBehaviour
         IncrementTurn();
 
         // this is horrible and might be wrong
+        // todo please fix !
         while (originalPlayerTurn != playerTurn || originalNum != (playerTurn ? enemyTurnNum : playerTurnNum))
         {
             if (GetCurrentUnit().CanAct())
@@ -231,24 +233,52 @@ public class GameManager : MonoBehaviour
         return pairs;
     }
 
-    // todo enemy turn taking
 
-
-    public void TakeEnemyTurns()
+    private void DoAction(ActionInfo action)
     {
-        if (playerTurn) return;
+        if (action.actionType == ActionType.EndTurn)
+        {
+            EndTurn();
+            return;
+        }
 
-
-        // take all enemy turns
-
-
-
-
-
-
-
+        if (action.actionType == ActionType.PlayCard)
+        {
+            PlayCard(action.actionNum, action.target);
+            return;
+        }
+    }
+  
+    private void TakeEnemyTurn()
+    {
+        if (playerTurn) {
+            throw new System.InvalidOperationException(
+                "Trying to take enemy turn on player turn");
+        }
+        if (GetCurrentUnit() is not EnemyUnit)
+        {
+            // this should never happen
+            throw new System.InvalidOperationException(
+                "how (not player turn but unit is player)");
+        }
+        EnemyUnit enemy = (EnemyUnit)GetCurrentUnit(); // downcast to EnemyUnit
+        DoAction(enemy.GiveAction(GetAllCardTargetPairs()));
     }
 
-    
+    // take all enemy turns
+    public void TakeEnemyTurns()
+    {
+        while (!playerTurn)
+        {
+            TakeEnemyTurn();
+        }
+    }
 
+
+    // change void to some struct
+    // give information about the game state (win, loss, other flags)
+    public void CheckGameState()
+    {
+
+    }
 }
