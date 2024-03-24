@@ -30,31 +30,30 @@ public static class NumberHelper
             throw new System.ArgumentException("Effect for damage cannot be none");
         }
 
-        float casterBonus = 1;
         if (damageType == casterType)
         {
-            casterBonus = casterBonusMult;
+            baseDamage = (int) (baseDamage * casterBonusMult);
         }
 
         if (damageType == Type.Absolute)
         {
-            return baseDamage; // * casterBonus?
+            return baseDamage;
         }
 
         if (defenderType == damageType)
         {
             // we assume baseDamage is positive
-            return (int)(baseDamage * strongMultiplier * casterBonus);
+            return (int)(baseDamage * strongMultiplier);
         }
 
         // if weakness pair is in opposite types
         if (oppositeTypes.Contains((defenderType, damageType)) || oppositeTypes.Contains((damageType, defenderType)))
         {
-            return (int)(baseDamage * weakMultipler * casterBonus);
+            return (int)(baseDamage * weakMultipler);
         }
 
         // no type weaknesses so return base damage
-        return baseDamage; // * casterBonus?
+        return baseDamage; 
     }
     
 }
