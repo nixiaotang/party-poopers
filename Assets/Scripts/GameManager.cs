@@ -76,6 +76,8 @@ public class GameManager : MonoBehaviour
 
             for (int i = 0; i < effect.outerMult; i++)
             {
+                // todo refactor this
+
                 if (effect.targetType == EffectTarget.Random)
                 {
                     ResolveInner(effect, targets[NumberHelper.comabtRNG.Next(targets.Count)], caster);
@@ -90,6 +92,9 @@ public class GameManager : MonoBehaviour
                 else if (effect.targetType == EffectTarget.Self)
                 {
                     ResolveInner(effect, caster, caster);
+                } else if (effect.targetType == EffectTarget.SelectedTarget)
+                {
+                    ResolveInner(effect, intendedTarget, caster);
                 }
             }
         }
@@ -146,14 +151,14 @@ public class GameManager : MonoBehaviour
     // turn num accordingly by skipping units that cannot play
     public void EndTurn()
     {
-        bool currentPlayerTurn = playerTurn;
-        int currentNum = currentPlayerTurn ? enemyTurnNum : playerTurnNum;
+        bool originalPlayerTurn = playerTurn;
+        int originalNum = originalPlayerTurn ? enemyTurnNum : playerTurnNum;
 
         GetCurrentUnit().EndTurn();
         IncrementTurn();
 
         // this is horrible and might be wrong
-        while (currentPlayerTurn != playerTurn || currentNum != (playerTurn ? enemyTurnNum : playerTurnNum))
+        while (originalPlayerTurn != playerTurn || originalNum != (playerTurn ? enemyTurnNum : playerTurnNum))
         {
             if (GetCurrentUnit().CanAct())
             {
@@ -225,5 +230,25 @@ public class GameManager : MonoBehaviour
         }
         return pairs;
     }
+
+    // todo enemy turn taking
+
+
+    public void TakeEnemyTurns()
+    {
+        if (playerTurn) return;
+
+
+        // take all enemy turns
+
+
+
+
+
+
+
+    }
+
+    
 
 }

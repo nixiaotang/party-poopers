@@ -13,7 +13,8 @@ public enum EffectTarget
 {
     Random,
     All,
-    Self
+    Self,
+    SelectedTarget,
 }
 
 [System.Serializable]
