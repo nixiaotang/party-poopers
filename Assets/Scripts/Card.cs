@@ -39,7 +39,7 @@ public struct CardInfo
 
 public class Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    public CardInfo _card;
+    public CardInfo cardInfo;
     [SerializeField] private TextMeshProUGUI _nameText;
     [SerializeField] private TextMeshProUGUI _cardDescText;
     [SerializeField] private Transform _effectParent;
@@ -49,14 +49,14 @@ public class Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public void Init(CardInfo cardInfo)
     {
-        _card = cardInfo;
+        this.cardInfo = cardInfo;
         _cardManager = transform.parent.GetComponent<CardManager>();
 
-        _nameText.text = _card.name;
-        transform.name = _card.name + " - Card";
-        _cardDescText.text = $"Type: {_card.type}\nMana: {_card.mana}\nTS: {_card.targetSpace.ToString()}";
+        _nameText.text = cardInfo.name;
+        transform.name = cardInfo.name + " - Card";
+        _cardDescText.text = $"Type: {cardInfo.type}\nMana: {cardInfo.mana}\nTS: {cardInfo.targetSpace}";
 
-        foreach(EffectInfo effectInfo in _card.effects)
+        foreach(EffectInfo effectInfo in cardInfo.effects)
         {
             GameObject effectObj = Instantiate(_effectPrefab, _effectParent);
             effectObj.GetComponent<Effect>().Init(effectInfo);

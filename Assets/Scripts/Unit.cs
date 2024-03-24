@@ -98,6 +98,7 @@ public class Unit : MonoBehaviour
         // pre: assume n is valid
         var playedCard = hand[n];
         hand.RemoveAt(n);
+        discard.Add(playedCard);
         return playedCard;
     }
 
@@ -107,8 +108,9 @@ public class Unit : MonoBehaviour
         {
             throw new System.ArgumentException(string.Format("Invalid card number: {0} max is: {1}", n, hand.Count), "n");
         }
-        return hand[n].GetComponent<CardInfo>().mana <= mana;
+        return hand[n].cardInfo.mana <= mana;
     }
+
     // moves a card to discard, subtracts mana cost, and returns the card.
     public Card PlayCard(int n)
     {
@@ -123,9 +125,10 @@ public class Unit : MonoBehaviour
             throw new System.ArgumentException(string.Format("Cannot play card {0}", n), "n");
         }
         
-        mana -= hand[n]._card.mana;
+        mana -= hand[n].cardInfo.mana;
         return MoveToDiscard(n);
     }
+
     // starts turn by drawing required cards
     public void StartTurn()
     {
@@ -145,8 +148,9 @@ public class Unit : MonoBehaviour
     // deals damage straight to player
     protected void RawTakeDamage(int rawDamage)
     {
-        health = System.Math.Max(health + rawDamage, 0);
+        health = System.Math.Max(health - rawDamage, 0);
     }
+
     // heals directly
     protected void RawHealHealth(int rawHeal)
     {
@@ -184,7 +188,7 @@ public class Unit : MonoBehaviour
     // INDIVIDUAL EFFECTS:
     private void Damage(EffectInfo effect, Unit caster)
     {
-        var damageTaken = NumberHelper.CalculateBasicDamage(effect.intensity, effect.type, GetUnitType(), caster.GetUnitType());
+        var damageTaken = NumberHelper.CalculateBasicDamage(effect.intensity, effect.type, type, caster.GetUnitType());
         // we can call animations or effects here?
         RawTakeDamage(damageTaken);
     }

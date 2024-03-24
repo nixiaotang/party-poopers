@@ -17,20 +17,7 @@ public class GameManager : MonoBehaviour
     private int playerTurnNum = 0;
     private int enemyTurnNum = 0;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    // get targets give targetSpace and target, can be empty if target
-    // is invalid
+    // get targets give targetSpace and target, can be empty if target is invalid
     private List<Unit> GetTargetsFromTarget(TargetSpace targetSpace, Unit target, Unit caster)
     {
         List<Unit> targets = new() { };
@@ -41,45 +28,31 @@ public class GameManager : MonoBehaviour
                 targets.AddRange(players);
                 targets.AddRange(enemies);
                 break;
+
             case TargetSpace.AllAlly:
-                if (caster is PartyMember)
-                {
-                    targets.AddRange(players);
-                } else
-                {
-                    targets.AddRange(enemies);
-                }
+                if (caster is PartyMember) targets.AddRange(players);
+                else targets.AddRange(enemies);
                 break;
+
             case TargetSpace.AllEnemy:
-                if (caster is PartyMember)
-                {
-                    targets.AddRange(enemies);
-                }
-                else
-                {
-                    targets.AddRange(players);
-                }
+                if (caster is PartyMember) targets.AddRange(enemies);
+                else targets.AddRange(players);
                 break;
+
             case TargetSpace.AnyAlly:
-                if (target.GetType() == caster.GetType())
-                {
-                    targets.Add(target);
-                }
+                if (target.GetType() == caster.GetType()) targets.Add(target);
                 break;
+
             case TargetSpace.AnyEnemy:
-                if (target.GetType() != caster.GetType())
-                {
-                    targets.Add(target);
-                }
+                if (target.GetType() != caster.GetType()) targets.Add(target);
                 break;
+
             case TargetSpace.Any:
                 targets.Add(target);
                 break;
+
             case TargetSpace.Self:
-                if (caster == target)
-                {
-                    targets.Add(target);
-                }
+                if (caster == target) targets.Add(target);
                 break;
         }
         return targets;
@@ -88,7 +61,7 @@ public class GameManager : MonoBehaviour
     // returns if card could be resolved or not
     private bool ResolveCard(Card card, Unit caster, Unit intendedTarget)
     {
-        TargetSpace targetSpace = card._card.targetSpace; 
+        TargetSpace targetSpace = card.cardInfo.targetSpace; 
 
         List<Unit> targets = GetTargetsFromTarget(targetSpace, intendedTarget, caster);
 
@@ -96,7 +69,7 @@ public class GameManager : MonoBehaviour
         {
             return false;
         }
-        EffectInfo[] effectInfos = card._card.effects;
+        EffectInfo[] effectInfos = card.cardInfo.effects;
 
         foreach (EffectInfo effect in effectInfos)
         {
@@ -242,7 +215,7 @@ public class GameManager : MonoBehaviour
         List<(int, Unit)> pairs = new();
         foreach (int i in GetPlayableCardPositions())
         {
-            TargetSpace targetSpace = currentUnit.GetHand()[i]._card.targetSpace;
+            TargetSpace targetSpace = currentUnit.GetHand()[i].cardInfo.targetSpace;
             foreach (Unit target in players.Concat<Unit>(enemies))
             {
                 if (GetTargetsFromTarget(targetSpace, target, currentUnit).Count > 0) {

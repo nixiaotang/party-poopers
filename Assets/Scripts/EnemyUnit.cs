@@ -35,14 +35,6 @@ public class EnemyUnit : Unit
     [SerializeField]
     private EnemyAI enemyAI;
 
-    private void Start()
-    {
-       
-    }
-    private void Update()
-    {
-        
-    }
     private ActionInfo PlayCardAction(int n, Unit target)
     {
         return new ActionInfo
