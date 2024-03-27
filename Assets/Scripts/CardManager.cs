@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class CardManager : MonoBehaviour
 {
-    [SerializeField] private List<CardInfo> cardInfos;
     [SerializeField] private GameObject cardPrefab;
 
     private List<Card> cards = new();
 
-    private void Start()
+    public void UpdateHand(List<CardInfo> cardInfos)
     {
+        cards.Clear();
+
         // instantiate every card specified by cardInfos list
         for(int i = 0; i < cardInfos.Count; i++)
         {

@@ -7,6 +7,9 @@ public class UIManager : MonoBehaviour
     public int deckNum;
     public int discardNum;
 
+    [SerializeField] private GameManager gameManager; // TODO: change this reference to be better
+
+    [SerializeField] private GameObject _playerTurnUI;
     [SerializeField] private TextMeshProUGUI _deckText;
     [SerializeField] private TextMeshProUGUI _discardText;
 
@@ -15,8 +18,7 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
-        _deckText.text = $"Deck\n({deckNum})";
-        _discardText.text = $"Discard\n({discardNum})";
+        UpdateUI();
     }
 
     private void Update()
@@ -32,5 +34,21 @@ public class UIManager : MonoBehaviour
             _lineRenderer.SetPosition(0, Camera.main.transform.position);
             _lineRenderer.SetPosition(1, hit.point);
         }
+    }
+
+    public void SetPlayerTurn(bool isPlayerTurn)
+    {
+        if (isPlayerTurn)
+        {
+            UpdateUI();
+            _playerTurnUI.SetActive(true);
+        }
+        else _playerTurnUI.SetActive(false);
+    }
+
+    private void UpdateUI()
+    {
+        _deckText.text = $"Deck\n({gameManager.GetCurrentUnitDrawSize()})";
+        _discardText.text = $"Discard\n({gameManager.GetCurrentUnitDiscardSize()})";
     }
 }

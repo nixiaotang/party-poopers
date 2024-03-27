@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using TMPro;
 
 public class Unit : MonoBehaviour
 {
@@ -24,20 +25,33 @@ public class Unit : MonoBehaviour
     //  front of deck is BOTTOM
           
     [SerializeField]
-    protected List<Card> deck;
+    protected List<CardInfo> deck;
+    protected List<CardInfo> hand = new();
+    protected List<CardInfo> discard = new();
 
-    protected List<Card> hand;
-    protected List<Card> discard;
+    [Space]
 
-    // Start is called before the first frame update
+    [SerializeField] private TextMeshProUGUI healthUI;
+
+    [SerializeField] private CardManager cardManager; // TODO: Fix this
+
     void Start()
     {
         Shuffle();
         health = maxHealth;
         mana = baseMana;
+
+        DrawCards(1);
+        cardManager.UpdateHand(hand);
     }
 
-    
+    private void Update()
+    {
+        // currently update UI every frame, will probably change this in the future
+        healthUI.text = $"{health}";
+    }
+
+
     // moves discard to deck, then shuffles
     protected void Shuffle()
     {
@@ -73,7 +87,7 @@ public class Unit : MonoBehaviour
     }
 
     // get hand
-    public List<Card> GetHand()
+    public List<CardInfo> GetHand()
     {
         return hand;
     }
@@ -93,7 +107,7 @@ public class Unit : MonoBehaviour
     }
 
     // moves a card in a spot to discard, and then return it
-    private Card MoveToDiscard(int n)
+    private CardInfo MoveToDiscard(int n)
     {
         // pre: assume n is valid
         var playedCard = hand[n];
@@ -108,11 +122,11 @@ public class Unit : MonoBehaviour
         {
             throw new System.ArgumentException(string.Format("Invalid card number: {0} max is: {1}", n, hand.Count), "n");
         }
-        return hand[n].cardInfo.mana <= mana;
+        return hand[n].mana <= mana;
     }
 
     // moves a card to discard, subtracts mana cost, and returns the card.
-    public Card PlayCard(int n)
+    public CardInfo PlayCard(int n)
     {
         // pre: checks for can play should have been made
         if (n >= hand.Count)
@@ -125,7 +139,7 @@ public class Unit : MonoBehaviour
             throw new System.ArgumentException(string.Format("Cannot play card {0}", n), "n");
         }
         
-        mana -= hand[n].cardInfo.mana;
+        mana -= hand[n].mana;
         return MoveToDiscard(n);
     }
 

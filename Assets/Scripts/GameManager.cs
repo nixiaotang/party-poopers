@@ -5,6 +5,8 @@ using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] public UIManager uiManager;
+    [SerializeField] public CardManager cardManager;
 
     [SerializeField]
     private List<PartyMember> players;
@@ -59,9 +61,9 @@ public class GameManager : MonoBehaviour
     }
 
     // returns if card could be resolved or not
-    private bool ResolveCard(Card card, Unit caster, Unit intendedTarget)
+    private bool ResolveCard(CardInfo card, Unit caster, Unit intendedTarget)
     {
-        TargetSpace targetSpace = card.cardInfo.targetSpace; 
+        TargetSpace targetSpace = card.targetSpace; 
 
         List<Unit> targets = GetTargetsFromTarget(targetSpace, intendedTarget, caster);
 
@@ -69,7 +71,7 @@ public class GameManager : MonoBehaviour
         {
             return false;
         }
-        EffectInfo[] effectInfos = card.cardInfo.effects;
+        EffectInfo[] effectInfos = card.effects;
 
         foreach (EffectInfo effect in effectInfos)
         {
@@ -182,7 +184,7 @@ public class GameManager : MonoBehaviour
         {
             return false;
         }
-        Card card = currentUnit.GetHand()[n];
+        CardInfo card = currentUnit.GetHand()[n];
         return ResolveCard(card, currentUnit, intendedTarget);
     }
 
@@ -192,7 +194,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    public List<Card> GetCurrentUnitCards()
+    public List<CardInfo> GetCurrentUnitCards()
     {
         return GetCurrentUnit().GetHand();
     }
@@ -200,7 +202,7 @@ public class GameManager : MonoBehaviour
     {
         return GetCurrentUnit().GetDrawSize();
     }
-    public int GetCurrentUnitDiscard()
+    public int GetCurrentUnitDiscardSize()
     {
         return GetCurrentUnit().GetDiscardSize();
     }
@@ -222,7 +224,7 @@ public class GameManager : MonoBehaviour
         List<(int, Unit)> pairs = new();
         foreach (int i in GetPlayableCardPositions())
         {
-            TargetSpace targetSpace = currentUnit.GetHand()[i].cardInfo.targetSpace;
+            TargetSpace targetSpace = currentUnit.GetHand()[i].targetSpace;
             foreach (Unit target in players.Concat<Unit>(enemies))
             {
                 if (GetTargetsFromTarget(targetSpace, target, currentUnit).Count > 0) {
